@@ -25,12 +25,14 @@ INSTALLED_APPS.append('admin_honeypot')
 INSTALLED_APPS.append('django_filters')
 INSTALLED_APPS.append('cachalot')
 INSTALLED_APPS.append('drf_yasg')
+INSTALLED_APPS.append('mptt')
 
 # Log
 
 # Security
 
 # Applications
+INSTALLED_APPS.append('categories')
 
 # ###################### #
 #     REST FRAMEWORK     #

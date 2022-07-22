@@ -44,6 +44,7 @@ urlpatterns = [
     path('api/doc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-swagger-ui'),
 
     # API
+    path('api/v1/', include('categories.api.v1.urls')),
 
 ] + static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT
