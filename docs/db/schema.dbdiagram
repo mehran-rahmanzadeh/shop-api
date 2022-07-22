@@ -1,0 +1,119 @@
+Table User as U {
+  id int [pk, increment]
+  username varchar [unique, not null]
+  email varchar
+  password varchar [not null]
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+Table Category as C {
+  id int [pk, increment]
+  slug varchar [not null, unique]
+  title varchar [not null, unique]
+  description text
+  image varchar
+  parent int [ref: > C.id]
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+Table Product as P {
+  id int [PK, increment]
+  slug varchar [not null, unique]
+  title varchar [not null, unique]
+  base_price decimal
+  discount_amount decimal
+  has_discount boolean
+  description varchar [not null]
+  category_id int [ref: > C.id]
+  quanity int
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+Table DiscountCode as D {
+  id int [PK, increment]
+  type discount_code_types
+  title varchar
+  code varchar [not null, unique]
+  percentage decimal
+  amount decimal
+  is_active boolean
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+Table DiscountCodeUsage {
+  id int [PK, increment]
+  user_id int [ref: > U.id]
+  discount_code_id int [ref: > D.id]
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+
+Table Cart as CA {
+  id int [PK, increment]
+  user_id int [ref: > U.id]
+  discout_code_id int [ref: > D.id, null]
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+Table CartItem {
+  id int [PK, increment]
+  product_id int [ref: > P.id]
+  cart_id int [ref: > CA.id]
+  quantity int
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+Table Order as O {
+  id int [primary key]
+  cart_id int [ref: > CA.id]
+  payment_id int [ref: > Payment.id, null]
+  status order_status
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+Table OrderItem {
+  id int [PK, increment]
+  product_id int [ref: > P.id]
+  order_id int [ref: > O.id]
+  quantity int
+  final_price decimal
+  created timestamp [default: `now()`]
+  modified timestamp [default: `now()`]
+}
+
+Table Payment {
+  id int [PK, increment]
+  tracking_code varchar
+  gateway payment_method
+  status payment_status
+}
+
+Enum discount_code_types {
+  percentage
+  amount
+}
+
+
+Enum order_status {
+  complete
+  inprogress
+  failed
+}
+
+Enum payment_method {
+  amazon_pay
+  google_pay
+}
+
+Enum payment_status {
+  successed
+  failed
+}
