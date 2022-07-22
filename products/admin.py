@@ -5,14 +5,18 @@ from products.models import Product
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'base_price', 'discount_amount', 'has_discount', 'quantity')
+    list_display = (
+        'title', 'category', 'final_price', 'base_price', 'discount_amount', 'has_discount', 'quantity')
     list_filter = ('category', 'has_discount')
     search_fields = ('title', 'description')
     ordering = ('-created',)
     readonly_fields = ('created', 'modified')
     fieldsets = (
         (None, {
-            'fields': ('title', 'category', 'base_price', 'discount_amount', 'has_discount', 'quantity')
+            'fields': (
+                'title', 'category', 'final_price',
+                'base_price', 'discount_amount',
+                'has_discount', 'quantity')
         }),
         ('Image', {
             'fields': ('image',)

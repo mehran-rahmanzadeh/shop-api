@@ -32,6 +32,12 @@ class Product(TimeStampModelMixin):
         decimal_places=2,
         default=0
     )
+    final_price = models.DecimalField(
+        _('Final price'),
+        max_digits=6,
+        decimal_places=2,
+        default=0
+    )
     has_discount = models.BooleanField(
         _('Has discount'),
         default=False
@@ -51,8 +57,7 @@ class Product(TimeStampModelMixin):
         blank=True
     )
 
-    @property
-    def final_price(self):
+    def get_final_price(self):
         return self.base_price - self.discount_amount if self.has_discount else self.base_price
 
     @property
@@ -61,6 +66,10 @@ class Product(TimeStampModelMixin):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.final_price = self.get_final_price()
+        super(Product, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _('Product')
