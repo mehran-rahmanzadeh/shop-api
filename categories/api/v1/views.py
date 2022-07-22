@@ -14,6 +14,7 @@ class CategoryViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend]
     filter_class = CategoryFilter
+    swagger_schema = None
 
     def get_queryset(self):
         return Category.objects.prefetch_related('children')
