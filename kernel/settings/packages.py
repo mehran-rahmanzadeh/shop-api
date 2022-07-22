@@ -34,6 +34,7 @@ INSTALLED_APPS.append('mptt')
 # Applications
 INSTALLED_APPS.append('categories')
 INSTALLED_APPS.append('products')
+INSTALLED_APPS.append('carts')
 
 # ###################### #
 #     REST FRAMEWORK     #
