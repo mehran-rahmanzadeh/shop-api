@@ -1,3 +1,27 @@
 from django.contrib import admin
 
-# Register your models here.
+from products.models import Product
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'base_price', 'discount_amount', 'has_discount', 'quantity')
+    list_filter = ('category', 'has_discount')
+    search_fields = ('title', 'description')
+    ordering = ('-created',)
+    readonly_fields = ('created', 'modified')
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'category', 'base_price', 'discount_amount', 'has_discount', 'quantity')
+        }),
+        ('Image', {
+            'fields': ('image',)
+        }),
+        ('Meta', {
+            'fields': ('slug', 'description')
+        }),
+        ('Timestamps', {
+            'fields': ('created', 'modified')
+        }),
+    )
+    prepopulated_fields = {'slug': ('title',)}
