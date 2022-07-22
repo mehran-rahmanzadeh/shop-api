@@ -21,3 +21,18 @@ class CategorySerializer(ModelSerializer):
         fields = super().get_fields()
         fields['children'] = CategorySerializer(many=True, required=False)
         return fields
+
+
+class CategoryListSerializer(ModelSerializer):
+    """Category serializer class"""
+
+    class Meta:
+        model = Category
+        fields = (
+            'id',
+            'title',
+            'slug',
+            'description',
+            'order',
+            'image'
+        )
