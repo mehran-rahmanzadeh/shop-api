@@ -1,6 +1,8 @@
 from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
+from django.urls import reverse_lazy
 
 from carts.models import CartItem, Cart
 from categories.models import Category
@@ -13,10 +15,11 @@ class TestDiscountCode(APITestCase):
     model test
     api endpoint test
     """
+
     def setUp(self):
         self.percent_code = 'test2022'
         self.kind = 'percent'
-        self.fixed_percentage = 20
+        self.fixed_percentage = 0.2
         self.amount = None
         self.is_active = True
         self.percent_discount = self.create_discount_code(
@@ -132,6 +135,11 @@ class TestDiscountCode(APITestCase):
             image=image
         )
 
+    @staticmethod
+    def generate_jwt_access_token_for_user(user):
+        """Authenticate user and generate token"""
+        return str(RefreshToken.for_user(user).access_token)
+
     def test_create_discount_code(self):
         """Test create discount code"""
         self.assertEqual(self.percent_discount.code, self.percent_code)
@@ -158,3 +166,71 @@ class TestDiscountCode(APITestCase):
                 )
 
         self.assertEqual(DiscountCode.objects.count(), 2)
+
+    def test_apply_percent_discount_code_on_user_cart(self):
+        """Test apply discount code on user cart"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        url = reverse_lazy('apply-discount-code')
+        payload = {
+            'code': self.percent_code
+        }
+        total_price_before = self.cart.total_price
+        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 200)
+
+    def test_apply_fixed_amount_discount_code_on_user_cart(self):
+        """Test apply discount code on user cart"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        url = reverse_lazy('apply-discount-code')
+        payload = {
+            'code': self.fixed_code
+        }
+        total_price_before = self.cart.total_price
+        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 200)
+
+    def test_apply_discount_code_invalid_code(self):
+        """Test apply discount code invalid code"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        url = reverse_lazy('apply-discount-code')
+        payload = {
+            'code': 'incorrect_code'
+        }
+        total_price_before = self.cart.total_price
+        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 400)
+
+    def test_apply_used_discount_code(self):
+        """Test apply used discount code"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        self.percent_discount.used_by.add(self.user)
+        url = reverse_lazy('apply-discount-code')
+        payload = {
+            'code': self.percent_code
+        }
+        total_price_before = self.cart.total_price
+        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 400)
+
+    def test_apply_deactivated_discount_code(self):
+        """Test apply deactivated discount code"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        self.percent_discount.is_active = False
+        self.percent_discount.save()
+        url = reverse_lazy('apply-discount-code')
+        payload = {
+            'code': self.percent_code
+        }
+        total_price_before = self.cart.total_price
+        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 400)
+
+    def test_apply_discount_code_unauthorized(self):
+        """Test apply discount code unauthorized"""
+        url = reverse_lazy('apply-discount-code')
+        payload = {
+            'code': self.percent_code
+        }
+        total_price_before = self.cart.total_price
+        response = self.client.post(url, payload)
+        self.assertEqual(response.status_code, 401)

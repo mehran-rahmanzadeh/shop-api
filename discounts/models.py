@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from painless.utils.models.mixins import TimeStampModelMixin
 
@@ -21,7 +22,15 @@ class DiscountCode(TimeStampModelMixin):
     )
     kind = models.CharField(_('Kind'), max_length=10, choices=KIND_CHOICES)
     code = models.CharField(_('Code'), max_length=255, unique=True)
-    percentage = models.PositiveSmallIntegerField(_('Percentage'), null=True, blank=True)
+    percentage = models.PositiveSmallIntegerField(
+        _('Percentage'),
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(1)
+        ]
+    )
     amount = models.DecimalField(_('Amount'), max_digits=10, decimal_places=2, null=True, blank=True)
     used_by = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name=_('Used by'),
