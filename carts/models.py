@@ -89,8 +89,13 @@ class Cart(TimeStampModelMixin):
         null=True,
         verbose_name=_('Address')
     )
-
-    # TODO: should add discount_code field
+    discount_code = models.ForeignKey(
+        'discounts.DiscountCode',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name=_('Discount code')
+    )
 
     def __str__(self):
         return '{}'.format(self.user)
