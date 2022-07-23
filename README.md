@@ -24,6 +24,11 @@
     ssh-keygen -t rsa -b 4096 -m PEM -f jwt-key
     openssl rsa -in jwt-key -pubout -outform PEM -out jwt-key.pub
   ```
+- Then, configure settings from `settings-template.ini`:
+  ```bash
+    cp settings-template.ini settings.ini
+  ```
+  #### NOTE: Here you should fill settings.ini with your own settings
 - Then, migrate database:
   ```bash
   python manage.py migrate
