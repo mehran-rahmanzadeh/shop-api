@@ -28,4 +28,5 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('created', 'modified')
         }),
     )
+    raw_id_fields = ('category',)
     prepopulated_fields = {'slug': ('title',)}
