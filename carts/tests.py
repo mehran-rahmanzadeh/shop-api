@@ -198,19 +198,66 @@ class TestCart(APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_delete_user_address_authenticated(self):
-        pass
+        token = self.generate_jwt_access_token_for_user(self.user)
+        url = reverse_lazy('address-delete', kwargs={'pk': self.address.id})
+        response = self.client.delete(url, {}, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 204)
 
     def test_delete_user_address_unauthorized(self):
-        pass
+        url = reverse_lazy('address-delete', kwargs={'pk': self.address.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 401)
 
     def test_create_user_address_authenticated(self):
-        pass
+        token = self.generate_jwt_access_token_for_user(self.user)
+        payload = {
+            'title': 'Test address',
+            'street': 'Test street',
+            'city': 'Test city',
+            'state': 'Test state',
+            'country': 'Test country',
+            'zip_code': 'Test zip code',
+            'phone': 'Test phone'
+        }
+        url = reverse_lazy('address-create', payload)
+        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['title'], payload['title'])
+        self.assertEqual(response.data['street'], payload['street'])
+        self.assertEqual(response.data['city'], payload['city'])
+        self.assertEqual(response.data['state'], payload['state'])
+        self.assertEqual(response.data['country'], payload['country'])
+        self.assertEqual(response.data['zip_code'], payload['zip_code'])
+        self.assertEqual(response.data['phone'], payload['phone'])
 
     def test_create_user_address_unauthorized(self):
-        pass
+        payload = {
+            'title': 'Test address',
+            'street': 'Test street',
+            'city': 'Test city',
+            'state': 'Test state',
+            'country': 'Test country',
+            'zip_code': 'Test zip code',
+            'phone': 'Test phone'
+        }
+        url = reverse_lazy('address-create', payload)
+        response = self.client.post(url, payload)
+        self.assertEqual(response.status_code, 401)
 
     def test_get_user_address_detail_authenticated(self):
-        pass
+        token = self.generate_jwt_access_token_for_user(self.user)
+        url = reverse_lazy('address-list', kwargs={'pk': self.address.id})
+        response = self.client.get(url, {}, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['title'], self.address.title)
+        self.assertEqual(response.data['street'], self.address.street)
+        self.assertEqual(response.data['city'], self.address.city)
+        self.assertEqual(response.data['state'], self.address.state)
+        self.assertEqual(response.data['country'], self.address.country)
+        self.assertEqual(response.data['zip_code'], self.address.zip_code)
+        self.assertEqual(response.data['phone'], self.address.phone)
 
     def test_get_user_address_detail_unauthorized(self):
-        pass
+        url = reverse_lazy('address-list', kwargs={'pk': self.address.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 401)
