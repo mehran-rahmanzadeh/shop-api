@@ -144,10 +144,13 @@ class TestProducts(APITestCase):
     def test_product_final_price_property(self):
         """Test product final price property"""
         self.product.discount_amount = 0
+        self.product.save()
         self.assertEqual(self.product.final_price, self.base_price)
         self.product.discount_amount = 10
+        self.product.save()
         self.assertEqual(self.product.final_price, self.base_price - 10)
         self.product.has_discount = False
+        self.product.save()
         self.assertEqual(self.product.final_price, self.base_price)
 
     def test_product_discount_percentage_property(self):
