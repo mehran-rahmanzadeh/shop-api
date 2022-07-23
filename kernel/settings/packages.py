@@ -18,6 +18,8 @@ INSTALLED_APPS.append('django.contrib.admindocs')
 INSTALLED_APPS.append('django.contrib.sites')
 INSTALLED_APPS.append('django.contrib.postgres')
 
+ELASTICSEARCH_ENABLED = config('ELASTICSEARCH_ENABLED', cast=bool, default=False)
+
 # packages
 INSTALLED_APPS.append('rest_framework')
 INSTALLED_APPS.append('corsheaders')
@@ -27,7 +29,8 @@ INSTALLED_APPS.append('django_filters')
 INSTALLED_APPS.append('cachalot')
 INSTALLED_APPS.append('drf_yasg')
 INSTALLED_APPS.append('mptt')
-INSTALLED_APPS.append('django_elasticsearch_dsl')
+if ELASTICSEARCH_ENABLED:
+    INSTALLED_APPS.append('django_elasticsearch_dsl')
 
 # Log
 
@@ -74,9 +77,9 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
 
-    'ALGORITHM': 'RS512',
-    'SIGNING_KEY': open(os.path.join(BASE_DIR, 'jwt-key')).read(),
-    'VERIFYING_KEY': open(os.path.join(BASE_DIR, 'jwt-key.pub')).read(),
+    'ALGORITHM': 'HS256',  # change to RS512 in production
+    'SIGNING_KEY': settings.SECRET_KEY,
+    'VERIFYING_KEY': None,
     'AUDIENCE': 'owner',
     'ISSUER': 'phonebook.com',
 
@@ -146,7 +149,6 @@ CACHALOT_UNCACHABLE_APPS = ('admin', 'auth',)
 
 # Elasticsearch
 # https://django-elasticsearch-dsl.readthedocs.io/en/latest/settings.html
-ELASTICSEARCH_ENABLED = config('ELASTICSEARCH_ENABLED', cast=bool, default=False)
 if ELASTICSEARCH_ENABLED:
     ELASTICSEARCH_DSL = {
         'default': {
