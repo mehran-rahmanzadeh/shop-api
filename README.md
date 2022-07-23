@@ -5,6 +5,10 @@
 - Swagger interface: [http://localhost:8000/api/doc/](http://localhost:8000/api/doc/)
 - Database schema: [dbdiagram.io](https://dbdiagram.io/d/5ff424bb80d742080a351386)
 ## Docker
+- Copy sample config
+```bash
+cp docs/docker/settings.ini .
+```
 - Build
 ```bash
 docker compose up -d --build
