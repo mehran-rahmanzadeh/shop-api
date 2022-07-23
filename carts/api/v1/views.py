@@ -71,3 +71,16 @@ class CartViewSet(UpdateModelMixin, ListModelMixin, GenericViewSet):
             serializer = self.get_serializer(cart)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['patch'])
+    def update_address(self, *args, **kwargs):
+        """Update cart address"""
+        serializer = CartCreateUpdateSerializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        address = serializer.validated_data['address']
+        cart = CartHelper.get_current_cart(self.request.user)
+        if cart:
+            cart.update_address(address)
+            serializer = self.get_serializer(cart)
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_404_NOT_FOUND)

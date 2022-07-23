@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.urls import reverse_lazy
 
-from carts.models import Cart, CartItem
+from carts.models import Cart, CartItem, Address
 from categories.models import Category
 from products.models import Product
 
@@ -52,6 +52,23 @@ class TestCart(APITestCase):
         )
         self.quantity = 2
         self.cart_item = self.create_cart_item(self.cart, self.product, self.quantity)
+        self.address_title = 'Test Address'
+        self.street = 'Test Street'
+        self.city = 'Test City'
+        self.state = 'Test State'
+        self.country = 'Test Country'
+        self.zip_code = '55555'
+        self.phone = '+989059528767'
+        self.address = self.create_address(
+            title=self.address_title,
+            street=self.street,
+            city=self.city,
+            state=self.state,
+            country=self.country,
+            zip_code=self.zip_code,
+            phone=self.phone,
+            user=self.user
+        )
 
     @staticmethod
     def create_user(username, password):
@@ -96,6 +113,20 @@ class TestCart(APITestCase):
             parent=parent,
             order=order,
             image=image
+        )
+
+    @staticmethod
+    def create_address(title, street, city, state, country, zip_code, user, phone):
+        """Create address"""
+        return Address.objects.create(
+            title=title,
+            street=street,
+            city=city,
+            state=state,
+            country=country,
+            zip_code=zip_code,
+            user=user,
+            phone=phone
         )
 
     @staticmethod
@@ -209,21 +240,26 @@ class TestCart(APITestCase):
     def test_add_address_to_cart_authenticated(self):
         """Test add address to cart authenticated"""
         token = self.generate_jwt_access_token_for_user(self.user)
-        url = reverse_lazy('set-address-to-cart')
+        url = reverse_lazy('cart-update-address')
         payload = {
             'address': self.address.id
         }
-        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        response = self.client.patch(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
         self.assertEqual(response.status_code, 202)
-        self.assertEqual(self.cart.address, self.address)
+        self.assertEqual(response.data['address']['title'], self.address.title)
+        self.assertEqual(response.data['address']['street'], self.address.street)
+        self.assertEqual(response.data['address']['city'], self.address.city)
+        self.assertEqual(response.data['address']['country'], self.address.country)
+        self.assertEqual(response.data['address']['zip_code'], self.address.zip_code)
+        self.assertEqual(response.data['address']['phone'], self.address.phone)
 
     def test_add_address_to_cart_unauthorized(self):
         """Test add address to cart unauthorized"""
-        url = reverse_lazy('set-address-to-cart')
+        url = reverse_lazy('cart-update-address')
         payload = {
             'address': self.address.id
         }
-        response = self.client.post(url, payload)
+        response = self.client.patch(url, payload)
         self.assertEqual(response.status_code, 401)
 
     def test_get_user_address_list_authenticated(self):

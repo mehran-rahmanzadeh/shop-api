@@ -36,7 +36,8 @@ class Address(TimeStampModelMixin):
     )
     zip_code = models.CharField(
         _('Zip code'),
-        max_length=255
+        max_length=5,
+        validators=[RegexValidator(r'^[0-9]{5}(?:-[0-9]{4})?$')]
     )
     country = models.CharField(
         _('Country'),
@@ -47,7 +48,7 @@ class Address(TimeStampModelMixin):
         max_length=15,
         null=True,
         blank=True,
-        validators=[RegexValidator('^(\+\d{1,3})?,?\s?\d{8,13}')]
+        validators=[RegexValidator(r'^(\+\d{1,3})?,?\s?\d{8,13}')]
     )
 
     def __str__(self):
@@ -139,6 +140,15 @@ class Cart(TimeStampModelMixin):
         if self.step not in ['initial', 'pending']:
             raise Exception('Cart is not in initial step')
         cart_item = self.items.filter(product=product).delete()
+
+    def update_address(self, address):
+        """Update address of cart
+        :param address: Address
+        """
+        if self.step not in ['initial', 'pending']:
+            raise Exception('Cart is not in initial step')
+        self.address = address
+        self.save()
 
     class Meta:
         verbose_name = _('Cart')

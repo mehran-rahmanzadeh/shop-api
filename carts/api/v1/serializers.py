@@ -104,14 +104,12 @@ class CartDetailSerializer(ModelSerializer):
 class CartCreateUpdateSerializer(ModelSerializer):
     """Cart create update serializer"""
     address = SlugRelatedField(slug_field='id', queryset=Address.objects.all())
-    user = HiddenField(default=CurrentUserDefault())
 
     class Meta:
         model = Cart
         fields = (
             'id',
             'step',
-            'user',
             'address',
             'created',
             'modified'
