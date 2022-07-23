@@ -16,6 +16,7 @@ from .base import (
 # admin
 INSTALLED_APPS.append('django.contrib.admindocs')
 INSTALLED_APPS.append('django.contrib.sites')
+INSTALLED_APPS.append('django.contrib.postgres')
 
 # packages
 INSTALLED_APPS.append('rest_framework')
@@ -26,6 +27,7 @@ INSTALLED_APPS.append('django_filters')
 INSTALLED_APPS.append('cachalot')
 INSTALLED_APPS.append('drf_yasg')
 INSTALLED_APPS.append('mptt')
+INSTALLED_APPS.append('django_elasticsearch_dsl')
 
 # Log
 
@@ -36,6 +38,7 @@ INSTALLED_APPS.append('categories')
 INSTALLED_APPS.append('products')
 INSTALLED_APPS.append('carts')
 INSTALLED_APPS.append('discounts')
+INSTALLED_APPS.append('search')
 
 # ###################### #
 #     REST FRAMEWORK     #
@@ -60,7 +63,8 @@ REST_FRAMEWORK = {
     #     'anon': '30/minute'
     # },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
+    'SEARCH_PARAM': 'query'
 }
 
 SIMPLE_JWT = {
@@ -139,3 +143,13 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: should be changed in production
 
 CACHALOT_UNCACHABLE_APPS = ('admin', 'auth',)
+
+# Elasticsearch
+# https://django-elasticsearch-dsl.readthedocs.io/en/latest/settings.html
+ELASTICSEARCH_ENABLED = config('ELASTICSEARCH_ENABLED', cast=bool, default=False)
+if ELASTICSEARCH_ENABLED:
+    ELASTICSEARCH_DSL = {
+        'default': {
+            'hosts': config('ELASTICSEARCH_HOST', default='localhost:9200'),
+        },
+    }

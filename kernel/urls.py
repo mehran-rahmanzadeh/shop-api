@@ -54,6 +54,7 @@ urlpatterns = [
     path('api/v1/', include('products.api.v1.urls')),
     path('api/v1/', include('carts.api.v1.urls')),
     path('api/v1/', include('discounts.api.v1.urls')),
+    path('api/v1/', include('search.api.v1.urls')),
 
 ] + static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT
