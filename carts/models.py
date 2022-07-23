@@ -100,6 +100,26 @@ class Cart(TimeStampModelMixin):
     def __str__(self):
         return '{}'.format(self.user)
 
+    @staticmethod
+    def __calculate_cart_price_after_discount(total, discount_code):
+        """Calculate cart price after discount
+        :param total: float
+        :param discount_code: DiscountCode
+        :return: float
+        """
+
+        # if its zero return
+        if not total:
+            return total
+
+        # multiple logics based on discount type
+        if discount_code.kind == 'percent':
+            total = total - (total * discount_code.percentage)
+        else:
+            total = total - discount_code.amount
+
+        return total
+
     @property
     def total_price(self):
         """Total price of cart
@@ -107,6 +127,11 @@ class Cart(TimeStampModelMixin):
         """
         total = self.items.aggregate(
             total=Sum(F('product__final_price') * F('quantity')))['total']
+
+        # check if it has discount
+        if self.discount_code:
+            total = self.__calculate_cart_price_after_discount(total, self.discount_code)
+
         return total if total else 0.0
 
     def add_product(self, product, quantity):
