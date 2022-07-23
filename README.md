@@ -6,6 +6,7 @@
 - PostgreSQL
 - Redis
 - Elasticsearch (Optional)
+- Docker
 
 ## Documentation
 - API Documentation file: [docs](docs/api/api.json)
