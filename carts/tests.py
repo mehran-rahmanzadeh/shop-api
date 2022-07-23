@@ -131,21 +131,21 @@ class TestCart(APITestCase):
     def test_get_user_cart_authenticated(self):
         """Test get user cart authenticated"""
         token = self.generate_jwt_access_token_for_user(self.user)
-        url = reverse_lazy('user-cart')
+        url = reverse_lazy('cart-current')
         response = self.client.get(url, {}, HTTP_AUTHORIZATION=f'Bearer {token}')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['total_price'], self.cart.total_price)
 
     def test_get_user_cart_unauthorized(self):
         """Test get user cart unauthorized"""
-        url = reverse_lazy('user-cart')
+        url = reverse_lazy('cart-current')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 401)
 
     def test_add_product_to_cart_authenticated(self):
         """Test add product to cart authenticated"""
         token = self.generate_jwt_access_token_for_user(self.user)
-        url = reverse_lazy('add-to-cart')
+        url = reverse_lazy('cart-add-to-cart')
         payload = {
             'product': self.product.id,
             'quantity': 3
@@ -156,12 +156,54 @@ class TestCart(APITestCase):
 
     def test_add_product_to_cart_unauthorized(self):
         """Test add product to cart unauthorized"""
-        url = reverse_lazy('add-to-cart')
+        url = reverse_lazy('cart-add-to-cart')
         payload = {
             'product': self.product.id,
             'quantity': 3
         }
         response = self.client.post(url, payload)
+        self.assertEqual(response.status_code, 401)
+
+    def test_update_cart_item_authenticated(self):
+        """Test update cart item authenticated"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        url = reverse_lazy('cart-update-item')
+        payload = {
+            'product': self.product.id,
+            'quantity': 4
+        }
+        response = self.client.patch(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(self.cart.total_price, self.product.final_price * 4)
+
+    def test_update_cart_item_unauthorized(self):
+        """Test update cart item unauthorized"""
+        url = reverse_lazy('cart-update-item')
+        payload = {
+            'product': self.product.id,
+            'quantity': 3
+        }
+        response = self.client.patch(url, payload)
+        self.assertEqual(response.status_code, 401)
+
+    def test_delete_cart_item_authenticated(self):
+        """Test delete cart item authenticated"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        url = reverse_lazy('cart-delete-item')
+        payload = {
+            'product': self.product.id
+        }
+        response = self.client.delete(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(self.cart.total_price, 0)
+
+    def test_delete_cart_item_unauthorized(self):
+        """Test delete cart item unauthorized"""
+        url = reverse_lazy('cart-delete-item')
+        payload = {
+            'product': self.product.id
+        }
+        response = self.client.delete(url, payload)
         self.assertEqual(response.status_code, 401)
 
     def test_add_address_to_cart_authenticated(self):
