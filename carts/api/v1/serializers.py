@@ -42,6 +42,7 @@ class AddressListSerializer(ModelSerializer):
 
 class AddressCreateUpdateSerializer(ModelSerializer):
     """Address serializer"""
+    user = HiddenField(default=CurrentUserDefault())
 
     class Meta:
         model = Address
@@ -53,7 +54,8 @@ class AddressCreateUpdateSerializer(ModelSerializer):
             'state',
             'zip_code',
             'country',
-            'phone'
+            'phone',
+            'user'
         )
 
 

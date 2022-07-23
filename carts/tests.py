@@ -268,6 +268,7 @@ class TestCart(APITestCase):
         url = reverse_lazy('address-list')
         response = self.client.get(url, {}, HTTP_AUTHORIZATION=f'Bearer {token}')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
 
     def test_get_user_address_list_unauthorized(self):
         """Test get user address list unauthorized"""
@@ -277,12 +278,12 @@ class TestCart(APITestCase):
 
     def test_delete_user_address_authenticated(self):
         token = self.generate_jwt_access_token_for_user(self.user)
-        url = reverse_lazy('address-delete', kwargs={'pk': self.address.id})
+        url = reverse_lazy('address-detail', kwargs={'id': self.address.id})
         response = self.client.delete(url, {}, HTTP_AUTHORIZATION=f'Bearer {token}')
         self.assertEqual(response.status_code, 204)
 
     def test_delete_user_address_unauthorized(self):
-        url = reverse_lazy('address-delete', kwargs={'pk': self.address.id})
+        url = reverse_lazy('address-detail', kwargs={'id': self.address.id})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 401)
 
@@ -294,10 +295,10 @@ class TestCart(APITestCase):
             'city': 'Test city',
             'state': 'Test state',
             'country': 'Test country',
-            'zip_code': 'Test zip code',
-            'phone': 'Test phone'
+            'zip_code': '44444',
+            'phone': '+991234567890'
         }
-        url = reverse_lazy('address-create', payload)
+        url = reverse_lazy('address-list')
         response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['title'], payload['title'])
@@ -308,6 +309,38 @@ class TestCart(APITestCase):
         self.assertEqual(response.data['zip_code'], payload['zip_code'])
         self.assertEqual(response.data['phone'], payload['phone'])
 
+    def test_create_user_address_invalid_zipcode(self):
+        """Test create user address invalid zipcode"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        payload = {
+            'title': 'Test address',
+            'street': 'Test street',
+            'city': 'Test city',
+            'state': 'Test state',
+            'country': 'Test country',
+            'zip_code': '4444',
+            'phone': '+991234567890'
+        }
+        url = reverse_lazy('address-list')
+        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_user_address_invalid_phone(self):
+        """Test create user address invalid phone"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        payload = {
+            'title': 'Test address',
+            'street': 'Test street',
+            'city': 'Test city',
+            'state': 'Test state',
+            'country': 'Test country',
+            'zip_code': '44444',
+            'phone': '+99123456'
+        }
+        url = reverse_lazy('address-list')
+        response = self.client.post(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 400)
+
     def test_create_user_address_unauthorized(self):
         payload = {
             'title': 'Test address',
@@ -315,16 +348,16 @@ class TestCart(APITestCase):
             'city': 'Test city',
             'state': 'Test state',
             'country': 'Test country',
-            'zip_code': 'Test zip code',
-            'phone': 'Test phone'
+            'zip_code': '44444',
+            'phone': '+991234567890'
         }
-        url = reverse_lazy('address-create', payload)
+        url = reverse_lazy('address-list')
         response = self.client.post(url, payload)
         self.assertEqual(response.status_code, 401)
 
     def test_get_user_address_detail_authenticated(self):
         token = self.generate_jwt_access_token_for_user(self.user)
-        url = reverse_lazy('address-list', kwargs={'pk': self.address.id})
+        url = reverse_lazy('address-detail', kwargs={'id': self.address.id})
         response = self.client.get(url, {}, HTTP_AUTHORIZATION=f'Bearer {token}')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['title'], self.address.title)
@@ -336,6 +369,76 @@ class TestCart(APITestCase):
         self.assertEqual(response.data['phone'], self.address.phone)
 
     def test_get_user_address_detail_unauthorized(self):
-        url = reverse_lazy('address-list', kwargs={'pk': self.address.id})
+        url = reverse_lazy('address-detail', kwargs={'id': self.address.id})
         response = self.client.get(url)
+        self.assertEqual(response.status_code, 401)
+
+    def test_update_user_address_authenticated(self):
+        """Test update user address authenticated"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        payload = {
+            'title': 'Test address 2',
+            'street': 'Test street 2',
+            'city': 'Test city 2',
+            'state': 'Test state 2',
+            'country': 'Test country 2',
+            'zip_code': '44442',
+            'phone': '+991234567892'
+        }
+        url = reverse_lazy('address-detail', kwargs={'id': self.address.id})
+        response = self.client.patch(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['title'], payload['title'])
+        self.assertEqual(response.data['street'], payload['street'])
+        self.assertEqual(response.data['city'], payload['city'])
+        self.assertEqual(response.data['state'], payload['state'])
+        self.assertEqual(response.data['country'], payload['country'])
+        self.assertEqual(response.data['zip_code'], payload['zip_code'])
+        self.assertEqual(response.data['phone'], payload['phone'])
+
+    def test_update_user_address_invalid_zipcode(self):
+        """Test update user address invalid zipcode"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        payload = {
+            'title': 'Test address',
+            'street': 'Test street',
+            'city': 'Test city',
+            'state': 'Test state',
+            'country': 'Test country',
+            'zip_code': '4444',
+            'phone': '+991234567890'
+        }
+        url = reverse_lazy('address-detail', kwargs={'id': self.address.id})
+        response = self.client.patch(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_user_address_invalid_phone(self):
+        """Test update user address invalid phone"""
+        token = self.generate_jwt_access_token_for_user(self.user)
+        payload = {
+            'title': 'Test address',
+            'street': 'Test street',
+            'city': 'Test city',
+            'state': 'Test state',
+            'country': 'Test country',
+            'zip_code': '44444',
+            'phone': '+99123456'
+        }
+        url = reverse_lazy('address-detail', kwargs={'id': self.address.id})
+        response = self.client.patch(url, payload, HTTP_AUTHORIZATION=f'Bearer {token}')
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_user_address_unauthorized(self):
+        """Test update user address unauthorized"""
+        payload = {
+            'title': 'Test address',
+            'street': 'Test street',
+            'city': 'Test city',
+            'state': 'Test state',
+            'country': 'Test country',
+            'zip_code': '44444',
+            'phone': '+991234567890'
+        }
+        url = reverse_lazy('address-detail', kwargs={'id': self.address.id})
+        response = self.client.patch(url, payload)
         self.assertEqual(response.status_code, 401)

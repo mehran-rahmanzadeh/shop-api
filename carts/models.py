@@ -14,7 +14,8 @@ class Address(TimeStampModelMixin):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        verbose_name=_('User')
+        verbose_name=_('User'),
+        related_name='addresses'
     )
     title = models.CharField(
         _('Title'),

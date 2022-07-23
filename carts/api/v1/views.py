@@ -1,11 +1,12 @@
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import ListModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 
-from carts.api.v1.serializers import CartCreateUpdateSerializer, CartDetailSerializer, CartItemCreateUpdateSerializer
+from carts.api.v1.serializers import CartCreateUpdateSerializer, CartDetailSerializer, CartItemCreateUpdateSerializer, \
+    AddressCreateUpdateSerializer, AddressDetailSerializer, AddressListSerializer
 from carts.api.v1.utils import CartHelper
 
 
@@ -84,3 +85,19 @@ class CartViewSet(UpdateModelMixin, ListModelMixin, GenericViewSet):
             serializer = self.get_serializer(cart)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class AddressViewSet(ModelViewSet):
+    """Address viewset"""
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return self.request.user.addresses.all()
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update']:
+            return AddressCreateUpdateSerializer
+        elif self.action == 'list':
+            return AddressListSerializer
+        return AddressDetailSerializer
