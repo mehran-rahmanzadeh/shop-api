@@ -4,8 +4,17 @@
 - API Documentation file: [docs](docs/api/api.json)
 - Swagger interface: [http://localhost:8000/api/doc/](http://localhost:8000/api/doc/)
 - Database schema: [dbdiagram.io](https://dbdiagram.io/d/5ff424bb80d742080a351386)
-
-## Installation
+## Docker
+- Build
+```bash
+docker compose up -d --build
+# or in older version: docker-compose up -d
+```
+- Load fixtures
+```bash
+docker exec -it shop_django python manage.py loaddata docs/fixtures/initial_data.json
+```
+## Manually
 - First, install the dependencies:
     ```bash
     pip install -r requirements.txt
