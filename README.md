@@ -1,9 +1,17 @@
 # InTime Shop API Task
 
+## Stack
+- Python 3.8
+- Django 3.2
+- PostgreSQL
+- Redis
+- Elasticsearch (Optional)
+
 ## Documentation
 - API Documentation file: [docs](docs/api/api.json)
 - Swagger interface: [http://localhost:8000/api/doc/](http://localhost:8000/api/doc/)
 - Database schema: [dbdiagram.io](https://dbdiagram.io/d/5ff424bb80d742080a351386)
+- Admin panel: [http://localhost:8000/secure/](http://localhost:8000/secure/)
 ## Docker
 - Copy sample config
 ```bash
