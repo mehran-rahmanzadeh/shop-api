@@ -91,22 +91,6 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-# #################### #
-#   BACKGROUND TASKS   #
-# #################### #
-BACKGROUND_TASK_RUN_ASYNC = True
-
-# ########### #
-#   CELERY    #
-# ########### #
-CELERY_BROKER_URL = config('CELERY_BROKER_URL')
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND')
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_ENABLE_UTC = True
-CELERY_TIMEZONE = 'UTC'
-
 # ########## #
 #   CACHE    #
 # ########## #
@@ -155,8 +139,3 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: should be changed in production
 
 CACHALOT_UNCACHABLE_APPS = ('admin', 'auth',)
-
-OTP_TOKEN_EXPIRE_TIME = 120
-OTP_REDIS_HOST = config('OTP_REDIS_HOST')
-OTP_REDIS_PORT = config('OTP_REDIS_PORT')
-OTP_REDIS_NAME = config('OTP_REDIS_NAME')

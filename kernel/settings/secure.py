@@ -69,13 +69,6 @@ CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
 CSRF_USE_SESSIONS = config('CSRF_USE_SESSIONS', cast=bool)
 CSRF_HEADER_NAME = config('CSRF_HEADER_NAME')
 
-# ######################### #
-#       OTP SETTING         #
-# ######################### #
-IRAN_OTP_SECRET_KEY = config('IRAN_OTP_SECRET_KEY')
-IRAN_OTP_USER_API_KEY = config('IRAN_OTP_USER_API_KEY')
-IRAN_OTP_TEMPLATE_ID = config('IRAN_OTP_TEMPLATE_ID')
-
 # ############################ #
 #          Monitoring          #
 # ############################ #
