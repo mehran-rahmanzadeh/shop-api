@@ -27,6 +27,10 @@ docker compose up -d --build
 ```bash
 docker exec -it shop_django python manage.py loaddata docs/fixtures/initial_data.json
 ```
+- Test
+```bash
+docker exec -it shop_django python manage.py test
+```
 ## Manually
 - First, install the dependencies:
     ```bash
