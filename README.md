@@ -28,10 +28,15 @@
   ```bash
     cp settings-template.ini settings.ini
   ```
-  #### NOTE: Here you should fill settings.ini with your own settings
+  #### NOTE: Here you should fill `settings.ini` with your own settings
+- #### NOTE: If you have `elasticsearch` installed, you should configure it in settings.ini (it's not required for searching you can also use PostgreSQL trigram search)
 - Then, migrate database:
   ```bash
   python manage.py migrate
+  ```
+- Run tests to make sure everything is working:
+  ```bash
+  python manage.py test
   ```
 - Now you can run server:
     ```bash
