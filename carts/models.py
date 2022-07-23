@@ -6,6 +6,45 @@ from django.utils.translation import ugettext_lazy as _
 from painless.utils.models.mixins import TimeStampModelMixin
 
 
+class Address(TimeStampModelMixin):
+    """
+    Address model
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name=_('User')
+    )
+    street = models.CharField(
+        _('Street'),
+        max_length=255
+    )
+    city = models.CharField(
+        _('City'),
+        max_length=255
+    )
+    state = models.CharField(
+        _('State'),
+        max_length=255
+    )
+    zip_code = models.CharField(
+        _('Zip code'),
+        max_length=255
+    )
+    country = models.CharField(
+        _('Country'),
+        max_length=255
+    )
+
+    def __str__(self):
+        return self.street
+
+    class Meta:
+        verbose_name = _('Address')
+        verbose_name_plural = _('Addresses')
+        ordering = ('-created',)
+
+
 class Cart(TimeStampModelMixin):
     """
     Cart model
@@ -15,8 +54,24 @@ class Cart(TimeStampModelMixin):
         ('pending', _('Pending')),
         ('paid', _('Paid'))
     )
-    step = models.CharField(_('Step'), choices=STEP_CHOICES, max_length=20, default='initial')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    step = models.CharField(
+        _('Step'),
+        choices=STEP_CHOICES,
+        max_length=20,
+        default='initial'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name=_('User')
+    )
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name=_('Address')
+    )
 
     # TODO: should add discount_code field
 
